@@ -414,7 +414,7 @@ app.get("/deletecart", function(req, res) {
 app.get("/Alogout",function(req,res)
 {
 req.session.destroy((err) => {
-  res.redirect('admin'); // will always fire after session is destroyed
+  res.redirect('admin'); 
 })
 
 });
@@ -422,7 +422,7 @@ req.session.destroy((err) => {
 app.get("/ulogout",function(req,res)
 {
 req.session.destroy((err) => {
-  res.redirect('login'); // will always fire after session is destroyed
+  res.redirect('login'); 
 })
 
 });
