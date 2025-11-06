@@ -114,9 +114,10 @@ app.get("/blog",function(req,res)
 res.sendFile("./minishop/blog.html",{root:__dirname});
 });
 
+
 app.get("/checkout",function(req,res)
 {
-res.sendFile("./minishop/checkout.html",{root:__dirname});
+res.render("checkout");
 });
 
 app.get("/login",function(req,res)
@@ -411,6 +412,84 @@ app.get("/deletecart", function(req, res) {
 
 
 
+app.post("/Billingprocess",ed,function(req,res)
+{
+  if(req.session.uemail==null)
+    res.redirect("login");
+  else
+  {
+var n = req.session.uname;
+var e = req.session.uemail;
+var b = req.body.fname;
+var c = req.body.lname;
+var d = req.body.email;
+var st = req.body.state;
+var f= req.body.addrss;
+var g = req.body.city;
+var h = req.body.pincode;
+var ph = req.body.pnumber;
+var pm = req.body.paymentmode;
+var qt="select productname,price,image from cart where email='"+e+"'";
+con.query(qt,function(err,result){
+var PN="";
+var pr=0;
+var img="";
+for(i=0;i<result.length;i++)
+  {
+    PN=PN+result[i].productname+",";
+    pr=pr+result[i].price;
+    img=img+result[i].image+",";
+  }
+
+  var q ="insert into orders(fname,lname,email,state,addrss,city,postalcode,phone,productname,productimage,amount,paymentmode) values ('"+b+"','"+c+"' ,'" +e+"' ,'"+st+"' ,'"+f+"','"+g+"',"+h+",'"+ph+"','"+PN+"','"+img+"',"+pr+",'"+pm+"')";
+con.query(q, function (err,result)
+{
+
+if (err) 
+throw err;
+var qt="delete from cart where email='"+e+"'";
+con.query(qt,function(err,result){
+res.send("Order Placed")
+});
+
+});
+
+})
+  }
+});
+
+app.get("/ViewOrder",function(req,res)
+{
+if(req.session.aname==null)
+res.redirect("admin");
+else
+{
+var q="select * from orders";
+con.query(q,function(err,result)
+{
+res.render("ViewOrder",{data:result});
+})
+}
+});
+
+
+ app.get("/delorders",function(req,res){
+  if(req.session.uemail==null) {
+    res.redirect("login");
+  } else
+     {
+    var a = req.query.orderid;
+    var q = "Delete from orders where orderid='"+a+"'";
+    con.query(q,function(err, result) {
+      if (err)
+         throw err;
+      res.redirect("ViewOrder"); 
+    });
+  }
+  
+ })
+
+
 app.get("/Alogout",function(req,res)
 {
 req.session.destroy((err) => {
@@ -424,6 +503,21 @@ app.get("/ulogout",function(req,res)
 req.session.destroy((err) => {
   res.redirect('login'); 
 })
+
+});
+
+app.get("/uservieworders",function(req,res){
+if(req.session.uname==null)
+res.redirect("login");
+else
+{
+  var e=req.session.uemail;
+var q="select * from orders where email='"+e+"'";
+con.query(q,function(err,result)
+{
+res.render("viewuserorder",{data:result});
+})
+}
 
 });
 
